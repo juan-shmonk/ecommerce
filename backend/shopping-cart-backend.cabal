@@ -1,0 +1,16 @@
+cabal-version: 2.4
+name: shopping-cart-backend
+version: 0.1.0.0
+build-type: Simple
+
+executable shopping-cart-backend
+  main-is: Main.hs
+  hs-source-dirs: app, src
+  default-language: Haskell2010
+  ghc-options: -Wall
+  build-depends:
+    base >=4.14 && <5,
+    scotty >=0.12,
+    aeson >=2.0,
+    text >=1.2,
+    wai-cors >=0.2
