@@ -17,6 +17,7 @@ export default function App() {
   // Estado de validacion de tarjeta.
   const [cardNumber, setCardNumber] = useState('')
   const [cardResult, setCardResult] = useState(null)
+  const [purchaseMessage, setPurchaseMessage] = useState('')
 
   useEffect(() => {
     // Cargar productos una sola vez.
@@ -41,6 +42,7 @@ export default function App() {
 
   // Agregar producto al carrito (si existe, suma cantidad).
   const addToCart = (product) => {
+    setPurchaseMessage('')
     setCart((prev) => {
       const index = prev.findIndex(
         (item) => item.product.productId === product.productId
@@ -59,11 +61,13 @@ export default function App() {
 
   // Eliminar producto del carrito por id.
   const removeFromCart = (productId) => {
+    setPurchaseMessage('')
     setCart((prev) => prev.filter((item) => item.product.productId !== productId))
   }
 
   // Vaciar carrito.
   const emptyCart = () => {
+    setPurchaseMessage('')
     setCart([])
   }
 
@@ -77,6 +81,16 @@ export default function App() {
   // Llamar al backend para validar tarjeta.
   const validateCard = async () => {
     setCardResult(null)
+    setPurchaseMessage('')
+
+    if (cart.length === 0) {
+      setCardResult({
+        valid: false,
+        message: 'Agrega al menos un producto antes de simular la compra.'
+      })
+      return
+    }
+
     try {
       const res = await fetch(`${API_URL}/validate-card`, {
         method: 'POST',
@@ -88,6 +102,14 @@ export default function App() {
       }
       const data = await res.json()
       setCardResult(data)
+
+      if (data.valid) {
+        setPurchaseMessage(
+          `Compra simulada realizada por $${total.toFixed(2)}.`
+        )
+        setCart([])
+        setCardNumber('')
+      }
     } catch (err) {
       setCardResult({ valid: false, message: err.message || 'Error inesperado' })
     }
@@ -117,21 +139,25 @@ export default function App() {
         </section>
 
         <section className="section">
-          <h2>Validar tarjeta (simulada)</h2>
+          <h2>Finalizar compra</h2>
           <div className="card-box">
             <input
               type="text"
               placeholder="Numero de tarjeta"
               value={cardNumber}
-              onChange={(e) => setCardNumber(e.target.value)}
+              onChange={(e) => {
+                setPurchaseMessage('')
+                setCardNumber(e.target.value)
+              }}
             />
-            <button onClick={validateCard}>Validar</button>
+            <button onClick={validateCard}>Validar y comprar</button>
           </div>
           {cardResult && (
             <p className={cardResult.valid ? 'ok' : 'error'}>
               {cardResult.message}
             </p>
           )}
+          {purchaseMessage && <p className="purchase">{purchaseMessage}</p>}
         </section>
       </div>
     </div>

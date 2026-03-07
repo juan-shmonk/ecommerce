@@ -139,6 +139,7 @@ button.link {
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .error {
@@ -151,4 +152,9 @@ button.link {
 
 .muted {
   color: var(--muted);
+}
+
+.purchase {
+  color: var(--accent-dark);
+  font-weight: bold;
 }
